@@ -149,6 +149,7 @@ public class Main extends Application {
 
             javafx.scene.control.Button exitButton = new javafx.scene.control.Button("退出");
             exitButton.setOnMouseClicked(e -> {
+                Task.saveTask();
                 Platform.exit();
                 System.exit(0);
             });

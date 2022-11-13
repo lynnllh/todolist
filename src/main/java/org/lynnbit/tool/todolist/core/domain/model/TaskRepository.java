@@ -12,4 +12,8 @@ public interface TaskRepository {
     List<Task> getTask(long fromTime, long toTime);
 
     List<Task> getUnfinishedTask();
+
+    void saveTask();
+
+    void loadTask();
 }

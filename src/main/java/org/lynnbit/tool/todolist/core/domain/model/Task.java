@@ -113,7 +113,14 @@ public class Task {
 
     public String[] getLabelNames() {
         return labels.stream().map(Label::getName).collect(Collectors.toList()).toArray(new String[0]);
+    }
 
+    public static void saveTask() {
+        taskRepository.saveTask();
+    }
+
+    public static void loadTask() {
+        taskRepository.loadTask();
     }
 
 }
