@@ -7,5 +7,9 @@ public interface TaskRepository {
 
     void addDoingTask(Task task);
 
+    void addNewTask(Task task);
+
     List<Task> getTask(long fromTime, long toTime);
+
+    List<Task> getUnfinishedTask();
 }

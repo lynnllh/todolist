@@ -2,14 +2,20 @@ package org.lynnbit.tool.todolist.core.domain.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.lynnbit.tool.todolist.core.infrastructure.persistent.TaskRepositoryImpl;
 
 public class Task {
+    private static TaskRepository taskRepository = new TaskRepositoryImpl();
 
     private Task(String content) {
         id = UUID.randomUUID().getMostSignificantBits();
         this.content = content;
         isFinish = false;
+        taskRepository.addNewTask(this);
     }
 
     private long id;
@@ -34,6 +40,14 @@ public class Task {
     public static Task createTask(String content, Label label) {
         Task task = createTask(content);
         task.addLabel(label);
+        return task;
+    }
+
+    public static Task createTask(String content, String... labels) {
+        Task task = createTask(content);
+        for (String label : labels) {
+            task.addLabel(Label.create(label));
+        }
         return task;
     }
 
@@ -65,4 +79,41 @@ public class Task {
     public void move2Category(Category category) {
         this.category = category;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Task other = (Task)obj;
+        return Objects.equals(id, other.id);
+    }
+
+    public static List<Task> getUnfinishedTask() {
+        return taskRepository.getUnfinishedTask();
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String[] getLabelNames() {
+        return labels.stream().map(Label::getName).collect(Collectors.toList()).toArray(new String[0]);
+
+    }
+
 }

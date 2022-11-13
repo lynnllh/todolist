@@ -1,5 +1,7 @@
 package org.lynnbit.tool.todolist.ui;
 
+import static org.lynnbit.tool.todolist.ui.Constant.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,10 +19,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 
 public class TaskPane {
-    private static final int MAX_TASK_LABEL_WIDTH = 300;
-    private static final int MAX_LABEL_LABEL_WIDTH = 120;
-    private static final int TASK_FONT_SIZE = 18;
-    private static final int LABEL_FONT_SIZE = 9;
 
     private static final List<Color> COLORS = Lists.newArrayList(Color.web("#f16d7a"), Color.web("#e27386"),
         Color.web("#f55066"), Color.web("#ef5464"), Color.web("#ae716e"), Color.web("#cb8e85"), Color.web("#cf8878"),
@@ -35,7 +33,6 @@ public class TaskPane {
     public static Pane create(String content, String... labels) {
         content = addIntent(content);
         FlowPane taskPane = new FlowPane();
-        // Label task = new Label(transferContent(content, TASK_FONT_SIZE, MAX_TASK_LABEL_WIDTH));
         Label task = new Label(content);
         task.setFont(new Font("微软雅黑", TASK_FONT_SIZE));
         task.setMaxWidth(MAX_TASK_LABEL_WIDTH);
@@ -66,8 +63,6 @@ public class TaskPane {
         labelPane.setVgap(3);
         labelPane.setMaxWidth(MAX_LABEL_LABEL_WIDTH);
         taskPane.getChildren().add(labelPane);
-
-        taskPane.getChildren().add(createLine());
 
         taskPane.setPrefHeight(transferHeight(content, TASK_FONT_SIZE, MAX_TASK_LABEL_WIDTH));
         return taskPane;
