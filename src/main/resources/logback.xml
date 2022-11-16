@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="GB2312"?>
+<configuration scan="true" scanPeriod="30 seconds" debug="false">
+    <!-- 每日 轮转LOG配置 -->
+    <appender name="TODOLIST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${user.home}/todolist/log/error.log</File>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level[%thread]%logger{56}.%method:%L -%msg%n</pattern>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名%i指定索引-->
+            <!-- LOG_PATH是上面配置的目录， %d是日期，%i是文件的序列号，比如文件大小超过10M后，就会创建i+1日志文件 -->
+            <fileNamePattern>${user.home}/todolist/log/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!--日志文件保留天数-->
+            <maxHistory>2</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!--控制台输出 -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%gray(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%thread] %highlight(%-5level) %green(%logger{50}) -
+                %highlight(%msg) %n"
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <root level="trace">
+        <appender-ref ref="TODOLIST"/>
+        <appender-ref ref="stdout"/>
+    </root>
+</configuration>

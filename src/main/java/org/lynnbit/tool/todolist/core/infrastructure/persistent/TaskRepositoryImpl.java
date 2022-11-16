@@ -77,10 +77,21 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public void loadTask() {
-        // FileUtils.readFileToString()
-    }
+        try {
+            String newTaskStr = FileUtils.readFileToString(new File(USER_HOME + PROJECT_DIR + NEW_TASK_FILE_NAME),
+                Charset.forName("UTF-8"));
 
-    public static void main(String[] args) {
-        System.out.println(System.getProperty("user.home"));
+            String doingTaskStr = FileUtils.readFileToString(new File(USER_HOME + PROJECT_DIR + DOING_TASK_FILE_NAME),
+                Charset.forName("UTF-8"));
+
+            String finishedTaskStr = FileUtils.readFileToString(
+                new File(USER_HOME + PROJECT_DIR + FINISHED_TASK_FILE_NAME), Charset.forName("UTF-8"));
+
+            newTask = JSON.parseArray(newTaskStr, Task.class);
+            doingTask = JSON.parseArray(doingTaskStr, Task.class);
+            finishedTask = JSON.parseArray(finishedTaskStr, Task.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

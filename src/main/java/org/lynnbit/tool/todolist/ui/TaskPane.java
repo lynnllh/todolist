@@ -11,11 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 
 public class TaskPane {
@@ -70,13 +68,6 @@ public class TaskPane {
 
     private static String addIntent(String content) {
         return "  " + content;
-    }
-
-    private static Node createLine() {
-        Line line = new Line(0, 0, MAX_TASK_LABEL_WIDTH + MAX_LABEL_LABEL_WIDTH, 0);
-        line.setStroke(Color.GREY);
-
-        return line;
     }
 
     private static double transferHeight(String content, int taskFontSize, int maxTaskLabelWidth) {

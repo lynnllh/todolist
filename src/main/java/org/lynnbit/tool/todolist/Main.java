@@ -11,6 +11,7 @@ import java.util.Objects;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.lynnbit.tool.todolist.core.application.TaskService;
 import org.lynnbit.tool.todolist.core.domain.model.Task;
 import org.lynnbit.tool.todolist.ui.Command;
 import org.lynnbit.tool.todolist.ui.TTrayIcon;
@@ -29,7 +30,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Main extends Application {
 
     private boolean firstTime;
@@ -41,20 +44,19 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.initStyle(StageStyle.TRANSPARENT);
-        Platform.setImplicitExit(false);
+        log.info("heee");
+        initData();
+        initHostKey(stage);
+        initStage(stage);
+        initAction(stage);
+        initTrayIcon(stage);
+        VBox vBox = initLayout();
+        Scene scene = new Scene(vBox);
+        stage.setScene(scene);
+        stage.show();
+    }
 
-        // 监听面板焦点
-        stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                stage.hide();
-                showProgramIsMinimizedMsg();
-            }
-        });
-
-        createTrayIcon(stage);
-        firstTime = true;
-
+    private VBox initLayout() {
         VBox vBox = new VBox();
         TextField textField = new TextField();
         textField.setPrefWidth(TEXT_FIELD_WIDTH);
@@ -68,18 +70,32 @@ public class Main extends Application {
         });
         vBox.getChildren().add(textField);
         vBox.getChildren().addAll(getUnfinishedTask());
+        return vBox;
+    }
 
-        Scene scene = new Scene(vBox);
+    private void initAction(Stage stage) {
+        // 监听面板焦点
+        stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                stage.hide();
+                showProgramIsMinimizedMsg();
+            }
+        });
+    }
 
-        stage.setScene(scene);
-        registerHostKey(stage);
-        stage.show();
+    private void initStage(Stage stage) {
+        stage.initStyle(StageStyle.TRANSPARENT);
+        Platform.setImplicitExit(false);
+    }
 
+    private void initData() {
+        TaskService.getInstance().loadTask();
+        firstTime = true;
     }
 
     private Collection<? extends Node> getUnfinishedTask() {
         List<Pane> ret = new ArrayList<>();
-        for (Task task : Task.getUnfinishedTask()) {
+        for (Task task : TaskService.getInstance().getUnfinishedTask()) {
             ret.add(TaskPane.create(task.getContent(), task.getLabelNames()));
         }
         return ret;
@@ -87,12 +103,10 @@ public class Main extends Application {
 
     private void consumeContent(String raw, Pane pane) {
         String[] list = raw.split(" ");
-        if (list.length == 0) {
+        if (list.length <= 1) {
             return;
         }
-        if (list.length == 1 && !list[0].equals(Command.LIST_TASK.getCode())) {
-            return;
-        }
+
         String commandStr = list[0];
         Command command = Command.getCommand(commandStr);
         if (Objects.isNull(command)) {
@@ -110,7 +124,7 @@ public class Main extends Application {
         }
 
         if (Command.ADD_TASK.equals(command)) {
-            Task.createTask(StringUtils.join(contentList, " "), labelList.toArray(new String[0]));
+            TaskService.getInstance().createTask(StringUtils.join(contentList, " "), labelList.toArray(new String[0]));
             refreshTaskList(pane);
         }
 
@@ -128,12 +142,12 @@ public class Main extends Application {
         pane.getScene().getWindow().sizeToScene();
     }
 
-    private void registerHostKey(Stage stage) {
+    private void initHostKey(Stage stage) {
         Provider provider = Provider.getCurrentProvider(true);
-        provider.register(KeyStroke.getKeyStroke("control Z"), hotKey -> Platform.runLater(() -> stage.show()));
+        provider.register(KeyStroke.getKeyStroke("control X"), hotKey -> Platform.runLater(() -> stage.show()));
     }
 
-    public void createTrayIcon(final Stage stage) {
+    public void initTrayIcon(final Stage stage) {
         if (SystemTray.isSupported()) {
             SystemTray tray = SystemTray.getSystemTray();
 
@@ -149,7 +163,7 @@ public class Main extends Application {
 
             javafx.scene.control.Button exitButton = new javafx.scene.control.Button("退出");
             exitButton.setOnMouseClicked(e -> {
-                Task.saveTask();
+                TaskService.getInstance().saveTask();
                 Platform.exit();
                 System.exit(0);
             });
@@ -165,7 +179,7 @@ public class Main extends Application {
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
-                System.err.println(e);
+                log.error("init tray failed, the detail message: ", e);
             }
         }
     }

@@ -8,10 +8,19 @@ import java.util.stream.Collectors;
 
 import org.lynnbit.tool.todolist.core.infrastructure.persistent.TaskRepositoryImpl;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task {
     private static TaskRepository taskRepository = new TaskRepositoryImpl();
 
-    private Task(String content) {
+    public Task(String content) {
         id = UUID.randomUUID().getMostSignificantBits();
         this.content = content;
         isFinish = false;
@@ -103,10 +112,6 @@ public class Task {
         return Objects.equals(id, other.id);
     }
 
-    public static List<Task> getUnfinishedTask() {
-        return taskRepository.getUnfinishedTask();
-    }
-
     public String getContent() {
         return content;
     }
@@ -114,13 +119,4 @@ public class Task {
     public String[] getLabelNames() {
         return labels.stream().map(Label::getName).collect(Collectors.toList()).toArray(new String[0]);
     }
-
-    public static void saveTask() {
-        taskRepository.saveTask();
-    }
-
-    public static void loadTask() {
-        taskRepository.loadTask();
-    }
-
 }
