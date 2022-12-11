@@ -72,14 +72,9 @@ public class TaskPane {
     }
 
     private static Label createLabel(org.lynnbit.tool.todolist.core.domain.model.Label labelModel) {
-        // Label label = new Label(getSplitedLineContent(labelModel.getName(), LABEL_FONT_SIZE, MAX_LABEL_LABEL_WIDTH));
-        Label label = new Label(labelModel.getName());
+        Label label = new Label(getSplitedLineContent(labelModel.getName(), LABEL_FONT_SIZE, MAX_LABEL_LABEL_WIDTH));
         label.setFont(new Font("微软雅黑", LABEL_FONT_SIZE));
         label.setBackground(new Background(new BackgroundFill(labelModel.getColor(), new CornerRadii(3), null)));
-        label.setMaxWidth(MAX_LABEL_LABEL_WIDTH);
-        label.setPrefWidth(MAX_LABEL_LABEL_WIDTH);
-        label.setWrapText(true);
-
         return label;
     }
 
