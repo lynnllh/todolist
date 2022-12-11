@@ -32,6 +32,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 先把后端的能力补齐 然后再实现前端的功能 然后再优化整体架构
+ */
 @Slf4j
 public class Main extends Application {
 

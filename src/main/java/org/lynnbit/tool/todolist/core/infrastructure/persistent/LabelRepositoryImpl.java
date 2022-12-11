@@ -1,28 +1,70 @@
 package org.lynnbit.tool.todolist.core.infrastructure.persistent;
 
-import java.util.HashMap;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.io.FileUtils;
+import org.lynnbit.tool.todolist.core.domain.model.Label;
+import org.lynnbit.tool.todolist.core.domain.model.LabelRepository;
 
-import com.google.common.collect.Lists;
+import com.alibaba.fastjson.JSON;
 
-public class LabelRepositoryImpl {
-    private static final List<String> COLORS = Lists.newArrayList("#f16d7a", "#e27386", "#f55066", "#ef5464", "#ae716e",
-        "#cb8e85", "#cf8878", "#c86f67", "#f1ccb8", "#f2debd", "#b7d28d", "#dcff93", "#ff9b6a", "#f1b8e4", "#d9b8f1",
-        "#f1ccb8", "#f1f1b8", "#b8f1ed", "#b8f1cc", "#e7dac9", "#e1622f", "#f3d64e", "#fd7d36", "#fe9778", "#c38e9e",
-        "#f28860", "#de772c", "#e96a25", "#ca7497", "#e29e4b", "#edbf2b", "#fecf45", "#f9b747", "#c17e61", "#ed9678",
-        "#ffe543", "#e37c5b", "#ff8240", "#aa5b71", "#f0b631", "#cf8888");
+public class LabelRepositoryImpl implements LabelRepository {
+    private static final String LABEL_FILE_NAME = "label.json";
+    private static final String PROJECT_DIR = "\\todolist\\";
+    private static String USER_HOME = System.getProperty("user.home");
 
-    private static Map<String, String> label2ColorMap = new HashMap<>();
+    private static Map<String, Label> labelMap = new LinkedHashMap<>(16, 0.75f, true);
 
-    public String getColor(String name) {
-        if (label2ColorMap.containsKey(name)) {
-            return label2ColorMap.get(name);
-        }
-        String color = COLORS.get(RandomUtils.nextInt() % COLORS.size());
-        label2ColorMap.put(name, color);
-        return color;
+    @Override
+    public boolean exist(String name) {
+        return labelMap.containsKey(name);
     }
+
+    @Override
+    public Label getLabel(String name) {
+        return labelMap.get(name);
+    }
+
+    @Override
+    public void addNewLabel(Label label) {
+        labelMap.put(label.getName(), label);
+    }
+
+    /**
+     * 搜索关键词 并按照访问顺序进行排序，最近访问的排在前面
+     * 
+     * @param key
+     * @return
+     */
+    @Override
+    public List<String> searchLabelName(String key) {
+        List<String> labelList =
+            labelMap.keySet().stream().filter(str -> str.contains(key)).collect(Collectors.toList());
+        Collections.reverse(labelList);
+        return labelList;
+    }
+
+    @Override
+    public void saveLabel() throws IOException {
+        FileUtils.write(new File(USER_HOME + PROJECT_DIR + LABEL_FILE_NAME), JSON.toJSONString(labelMap.values()),
+            Charset.forName("UTF-8"));
+    }
+
+    @Override
+    public void loadLabel() throws IOException {
+        String labelStr =
+            FileUtils.readFileToString(new File(USER_HOME + PROJECT_DIR + LABEL_FILE_NAME), Charset.forName("UTF-8"));
+
+        List<Label> labels = JSON.parseArray(labelStr, Label.class);
+        labelMap = labels.stream().collect(Collectors.toMap(Label::getName, Function.identity()));
+    }
+
 }

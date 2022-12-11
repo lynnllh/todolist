@@ -55,7 +55,7 @@ public class Task {
     public static Task createTask(String content, String... labels) {
         Task task = createTask(content);
         for (String label : labels) {
-            task.addLabel(Label.create(label));
+            task.addLabel(Label.getOrCreate(label));
         }
         return task;
     }
