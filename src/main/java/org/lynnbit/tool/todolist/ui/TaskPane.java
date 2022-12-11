@@ -7,23 +7,21 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.lynnbit.tool.todolist.core.domain.model.Task;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
 public class TaskPane {
-    public static Pane create(String content, String... labels) {
-        Task taskModel = Task.createTask(content, labels);
+    public static Pane create(String content, List<org.lynnbit.tool.todolist.core.domain.model.Label> labels) {
 
         FlowPane taskPane = new FlowPane();
 
-        taskPane.getChildren().add(createTaskLabel(taskModel.getContent()));
-        taskPane.getChildren().add(createLabelPane(taskModel.getLabels()));
+        taskPane.getChildren().add(createTaskLabel(content));
+        taskPane.getChildren().add(createLabelPane(labels));
         taskPane.setPickOnBounds(true);
 
-        taskPane.setPrefHeight(getContentHeight(taskModel.getContent(), TASK_FONT_SIZE, MAX_TASK_LABEL_WIDTH));
+        taskPane.setPrefHeight(getContentHeight(content, TASK_FONT_SIZE, MAX_TASK_LABEL_WIDTH));
         return taskPane;
     }
 

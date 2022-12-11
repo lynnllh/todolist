@@ -98,7 +98,7 @@ public class Main extends Application {
     private Collection<? extends Node> getUnfinishedTask() {
         List<Pane> ret = new ArrayList<>();
         for (Task task : Task.getUnfinishedTask()) {
-            ret.add(TaskPane.create(task.getContent(), task.getLabelNames()));
+            ret.add(TaskPane.create(task.getContent(), task.getLabels()));
         }
         return ret;
     }
