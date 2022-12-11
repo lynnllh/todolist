@@ -11,10 +11,11 @@ import java.util.Objects;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.lynnbit.tool.todolist.core.domain.model.Label;
 import org.lynnbit.tool.todolist.core.domain.model.Task;
 import org.lynnbit.tool.todolist.ui.Command;
 import org.lynnbit.tool.todolist.ui.TaskPane;
-import org.lynnbit.tool.todolist.ui.trayIcon.TTrayIcon;
+import org.lynnbit.tool.todolist.ui.trayIcon.ApplicationTrayIcon;
 
 import com.tulskiy.keymaster.common.Provider;
 
@@ -37,8 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Main extends Application {
 
-    private boolean firstTime;
-    private TrayIcon trayIcon;
+    private ApplicationTrayIcon trayIcon;
 
     public static void main(String[] args) {
         Application.launch();
@@ -80,7 +80,7 @@ public class Main extends Application {
         stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 stage.hide();
-                showProgramIsMinimizedMsg();
+                trayIcon.disPlayMessageInFirstTime();
             }
         });
     }
@@ -92,7 +92,7 @@ public class Main extends Application {
 
     private void initData() {
         Task.loadTask();
-        firstTime = true;
+        Label.loadLabel();
     }
 
     private Collection<? extends Node> getUnfinishedTask() {
@@ -155,41 +155,13 @@ public class Main extends Application {
 
             Image image = Toolkit.getDefaultToolkit().getImage(getClass().getClassLoader().getResource("tray.png"));
 
-            VBox vBox = new VBox();
-            javafx.scene.control.Button showButton = new javafx.scene.control.Button("显示");
-            showButton.setOnMouseClicked(e -> {
-                Platform.runLater(() -> stage.show());
-            });
-            showButton.setPrefWidth(100);
-            showButton.setPrefHeight(20);
-
-            javafx.scene.control.Button exitButton = new javafx.scene.control.Button("退出");
-            exitButton.setOnMouseClicked(e -> {
-                Task.saveTask();
-                Platform.exit();
-                System.exit(0);
-            });
-            exitButton.setPrefWidth(100);
-            exitButton.setPrefHeight(20);
-
-            vBox.getChildren().addAll(showButton, exitButton);
-            vBox.setPrefWidth(100);
-            vBox.setPrefHeight(40);
-
-            trayIcon = new TTrayIcon(image, "to do list", vBox);
+            trayIcon = new ApplicationTrayIcon(image, "to do list", stage);
 
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
                 log.error("init tray failed, the detail message: ", e);
             }
-        }
-    }
-
-    public void showProgramIsMinimizedMsg() {
-        if (firstTime) {
-            trayIcon.displayMessage("通知", "to do list已隐藏于系统托盘", TrayIcon.MessageType.INFO);
-            firstTime = false;
         }
     }
 }
