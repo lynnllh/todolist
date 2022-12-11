@@ -23,6 +23,14 @@ public class LabelRepositoryImpl implements LabelRepository {
 
     private static Map<String, Label> labelMap = new LinkedHashMap<>(16, 0.75f, true);
 
+    private static LabelRepositoryImpl instance = new LabelRepositoryImpl();
+
+    private LabelRepositoryImpl() {}
+
+    public static LabelRepository getInstance() {
+        return instance;
+    }
+
     @Override
     public boolean exist(String name) {
         return labelMap.containsKey(name);

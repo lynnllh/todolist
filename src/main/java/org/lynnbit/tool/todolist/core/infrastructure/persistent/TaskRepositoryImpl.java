@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.lynnbit.tool.todolist.core.domain.model.Task;
 import org.lynnbit.tool.todolist.core.domain.model.TaskRepository;
+import org.lynnbit.tool.todolist.core.domain.model.TaskState;
 
 import com.alibaba.fastjson.JSON;
 
@@ -21,6 +22,14 @@ public class TaskRepositoryImpl implements TaskRepository {
     private List<Task> finishedTask = new ArrayList<>();
 
     private List<Task> unfinishedTask = new ArrayList<>();
+
+    private static TaskRepositoryImpl instance = new TaskRepositoryImpl();
+
+    private TaskRepositoryImpl() {}
+
+    public static TaskRepository getInstance() {
+        return instance;
+    }
 
     @Override
     public void finishTask(Task task) {
@@ -47,6 +56,10 @@ public class TaskRepositoryImpl implements TaskRepository {
     public void changeUnfinishedTaskOrder(Task task, Integer order) {
         if (!unfinishedTask.contains(task)) {
             throw new IllegalStateException("the task is not created");
+        }
+
+        if (task.getState().equals(TaskState.FINISHED)) {
+            throw new IllegalStateException("can't change finished task order");
         }
 
         if (order >= unfinishedTask.size()) {

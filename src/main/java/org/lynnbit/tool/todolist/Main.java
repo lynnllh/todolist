@@ -11,7 +11,6 @@ import java.util.Objects;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.lynnbit.tool.todolist.core.application.TaskService;
 import org.lynnbit.tool.todolist.core.domain.model.Task;
 import org.lynnbit.tool.todolist.ui.Command;
 import org.lynnbit.tool.todolist.ui.TTrayIcon;
@@ -92,13 +91,13 @@ public class Main extends Application {
     }
 
     private void initData() {
-        TaskService.getInstance().loadTask();
+        Task.loadTask();
         firstTime = true;
     }
 
     private Collection<? extends Node> getUnfinishedTask() {
         List<Pane> ret = new ArrayList<>();
-        for (Task task : TaskService.getInstance().getUnfinishedTask()) {
+        for (Task task : Task.getUnfinishedTask()) {
             ret.add(TaskPane.create(task.getContent(), task.getLabelNames()));
         }
         return ret;
@@ -127,7 +126,7 @@ public class Main extends Application {
         }
 
         if (Command.ADD_TASK.equals(command)) {
-            TaskService.getInstance().createTask(StringUtils.join(contentList, " "), labelList.toArray(new String[0]));
+            Task.createTask(StringUtils.join(contentList, " "), labelList.toArray(new String[0]));
             refreshTaskList(pane);
         }
 
@@ -166,7 +165,7 @@ public class Main extends Application {
 
             javafx.scene.control.Button exitButton = new javafx.scene.control.Button("退出");
             exitButton.setOnMouseClicked(e -> {
-                TaskService.getInstance().saveTask();
+                Task.saveTask();
                 Platform.exit();
                 System.exit(0);
             });

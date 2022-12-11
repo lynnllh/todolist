@@ -1,5 +1,6 @@
 package org.lynnbit.tool.todolist.core.domain.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -12,25 +13,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Task {
-    private static TaskRepository taskRepository = new TaskRepositoryImpl();
+
+    private static TaskRepository taskRepository = TaskRepositoryImpl.getInstance();
 
     public Task(String content) {
         id = UUID.randomUUID().getMostSignificantBits();
         this.content = content;
-        isFinish = false;
         state = TaskState.NEW;
-        taskRepository.addNewTask(this);
     }
 
     private long id;
-
-    private boolean isFinish;
 
     private TaskState state;
 
@@ -40,26 +40,19 @@ public class Task {
 
     private String content;
 
-    private List<Label> labels = new ArrayList<Label>();
-
-    private Category category;
+    private List<Label> labels = new ArrayList<>();
 
     public static Task createTask(String content) {
         Task task = new Task(content);
         return task;
     }
 
-    public static Task createTask(String content, Label label) {
-        Task task = createTask(content);
-        task.addLabel(label);
-        return task;
-    }
-
     public static Task createTask(String content, String... labels) {
         Task task = createTask(content);
         for (String label : labels) {
-            task.addLabel(Label.getOrCreate(label));
+            task.addLabel(Label.getOrCreateLabel(label));
         }
+        taskRepository.addNewTask(task);
         return task;
     }
 
@@ -80,16 +73,53 @@ public class Task {
     }
 
     public void startTask() {
+        if (!state.equals(TaskState.NEW)) {
+            throw new IllegalStateException("the task is not just created.");
+        }
+
         startTime = System.currentTimeMillis();
+        state = TaskState.DOING;
     }
 
     public void finishTask() {
-        isFinish = true;
+        if (!state.equals(TaskState.DOING)) {
+            throw new IllegalStateException("the task is not started.");
+        }
         finishTime = System.currentTimeMillis();
+        state = TaskState.FINISHED;
+        taskRepository.finishTask(this);
     }
 
-    public void move2Category(Category category) {
-        this.category = category;
+    public void changeOrder(Integer order) {
+        taskRepository.changeUnfinishedTaskOrder(this, order);
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String[] getLabelNames() {
+        return labels.stream().map(Label::getName).collect(Collectors.toList()).toArray(new String[0]);
+    }
+
+    public static List<Task> getUnfinishedTask() {
+        return taskRepository.getUnfinishedTask();
+    }
+
+    public static void saveTask() {
+        try {
+            taskRepository.saveTask();
+        } catch (IOException e) {
+            log.error("save task failed.", e);
+        }
+    }
+
+    public static void loadTask() {
+        try {
+            taskRepository.loadTask();
+        } catch (IOException e) {
+            log.error("load task failed.", e);
+        }
     }
 
     @Override
@@ -113,13 +143,5 @@ public class Task {
 
         Task other = (Task)obj;
         return Objects.equals(id, other.id);
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public String[] getLabelNames() {
-        return labels.stream().map(Label::getName).collect(Collectors.toList()).toArray(new String[0]);
     }
 }
