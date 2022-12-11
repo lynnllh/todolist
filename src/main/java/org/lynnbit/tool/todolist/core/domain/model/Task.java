@@ -24,12 +24,15 @@ public class Task {
         id = UUID.randomUUID().getMostSignificantBits();
         this.content = content;
         isFinish = false;
+        state = TaskState.NEW;
         taskRepository.addNewTask(this);
     }
 
     private long id;
 
     private boolean isFinish;
+
+    private TaskState state;
 
     private long startTime;
 

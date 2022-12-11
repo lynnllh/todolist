@@ -1,11 +1,10 @@
 package org.lynnbit.tool.todolist.core.domain.model;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface TaskRepository {
-    void addFinishedTask(Task task);
-
-    void addDoingTask(Task task);
+    void finishTask(Task task);
 
     void addNewTask(Task task);
 
@@ -13,7 +12,9 @@ public interface TaskRepository {
 
     List<Task> getUnfinishedTask();
 
-    void saveTask();
+    void changeUnfinishedTaskOrder(Task task, Integer order);
 
-    void loadTask();
+    void saveTask() throws IOException;
+
+    void loadTask() throws IOException;
 }

@@ -13,47 +13,47 @@ import org.lynnbit.tool.todolist.core.domain.model.TaskRepository;
 import com.alibaba.fastjson.JSON;
 
 public class TaskRepositoryImpl implements TaskRepository {
-    private static final String NEW_TASK_FILE_NAME = "newTask.json";
-    private static final String DOING_TASK_FILE_NAME = "doingTask.json";
+    private static final String UNFINISHED_TASK_FILE_NAME = "unfinishedTask.json";
     private static final String FINISHED_TASK_FILE_NAME = "finishedTask.json";
     private static final String PROJECT_DIR = "\\todolist\\";
     private static String USER_HOME = System.getProperty("user.home");
 
     private List<Task> finishedTask = new ArrayList<>();
 
-    private List<Task> doingTask = new ArrayList<>();
-
-    private List<Task> newTask = new ArrayList<>();
+    private List<Task> unfinishedTask = new ArrayList<>();
 
     @Override
-    public void addFinishedTask(Task task) {
-        if (!doingTask.contains(task)) {
-            throw new IllegalStateException("the task is not started");
+    public void finishTask(Task task) {
+        if (!unfinishedTask.contains(task)) {
+            throw new IllegalStateException("the task is not created");
         }
-        doingTask.remove(task);
+        unfinishedTask.remove(task);
         finishedTask.add(task);
     }
 
     @Override
-    public void addDoingTask(Task task) {
-        if (!newTask.contains(task)) {
-            throw new IllegalStateException("the task is not created");
-        }
-        newTask.remove(task);
-        doingTask.add(task);
-    }
-
-    @Override
     public void addNewTask(Task task) {
-        newTask.add(task);
+        unfinishedTask.add(task);
     }
 
     @Override
     public List<Task> getUnfinishedTask() {
         List<Task> ret = new ArrayList<>();
-        ret.addAll(doingTask);
-        ret.addAll(newTask);
+        ret.addAll(unfinishedTask);
         return ret;
+    }
+
+    @Override
+    public void changeUnfinishedTaskOrder(Task task, Integer order) {
+        if (!unfinishedTask.contains(task)) {
+            throw new IllegalStateException("the task is not created");
+        }
+
+        if (order >= unfinishedTask.size()) {
+            throw new IllegalStateException("the order is exceed the size of unfinished task list");
+        }
+        unfinishedTask.remove(task);
+        unfinishedTask.add(order, task);
     }
 
     @Override
@@ -62,36 +62,22 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public void saveTask() {
-        try {
-            FileUtils.write(new File(USER_HOME + PROJECT_DIR + NEW_TASK_FILE_NAME), JSON.toJSONString(newTask),
-                Charset.forName("UTF-8"));
-            FileUtils.write(new File(USER_HOME + PROJECT_DIR + DOING_TASK_FILE_NAME), JSON.toJSONString(doingTask),
-                Charset.forName("UTF-8"));
-            FileUtils.write(new File(USER_HOME + PROJECT_DIR + FINISHED_TASK_FILE_NAME),
-                JSON.toJSONString(finishedTask), Charset.forName("UTF-8"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void saveTask() throws IOException {
+        FileUtils.write(new File(USER_HOME + PROJECT_DIR + UNFINISHED_TASK_FILE_NAME),
+            JSON.toJSONString(unfinishedTask), Charset.forName("UTF-8"));
+        FileUtils.write(new File(USER_HOME + PROJECT_DIR + FINISHED_TASK_FILE_NAME), JSON.toJSONString(finishedTask),
+            Charset.forName("UTF-8"));
     }
 
     @Override
-    public void loadTask() {
-        try {
-            String newTaskStr = FileUtils.readFileToString(new File(USER_HOME + PROJECT_DIR + NEW_TASK_FILE_NAME),
-                Charset.forName("UTF-8"));
+    public void loadTask() throws IOException {
+        String unfinishedTaskStr = FileUtils
+            .readFileToString(new File(USER_HOME + PROJECT_DIR + UNFINISHED_TASK_FILE_NAME), Charset.forName("UTF-8"));
 
-            String doingTaskStr = FileUtils.readFileToString(new File(USER_HOME + PROJECT_DIR + DOING_TASK_FILE_NAME),
-                Charset.forName("UTF-8"));
+        String finishedTaskStr = FileUtils.readFileToString(new File(USER_HOME + PROJECT_DIR + FINISHED_TASK_FILE_NAME),
+            Charset.forName("UTF-8"));
 
-            String finishedTaskStr = FileUtils.readFileToString(
-                new File(USER_HOME + PROJECT_DIR + FINISHED_TASK_FILE_NAME), Charset.forName("UTF-8"));
-
-            newTask = JSON.parseArray(newTaskStr, Task.class);
-            doingTask = JSON.parseArray(doingTaskStr, Task.class);
-            finishedTask = JSON.parseArray(finishedTaskStr, Task.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        unfinishedTask = JSON.parseArray(unfinishedTaskStr, Task.class);
+        finishedTask = JSON.parseArray(finishedTaskStr, Task.class);
     }
 }

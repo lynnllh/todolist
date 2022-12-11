@@ -1,5 +1,6 @@
 package org.lynnbit.tool.todolist.core.application;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,11 +27,19 @@ public class TaskService {
     }
 
     public void saveTask() {
-        taskRepository.saveTask();
+        try {
+            taskRepository.saveTask();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void loadTask() {
-        taskRepository.loadTask();
+        try {
+            taskRepository.loadTask();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<Task> getUnfinishedTask() {
