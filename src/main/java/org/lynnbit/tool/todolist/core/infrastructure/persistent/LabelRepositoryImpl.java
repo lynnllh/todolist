@@ -68,11 +68,13 @@ public class LabelRepositoryImpl implements LabelRepository {
 
     @Override
     public void loadLabel() throws IOException {
-        String labelStr =
-            FileUtils.readFileToString(new File(USER_HOME + PROJECT_DIR + LABEL_FILE_NAME), Charset.forName("UTF-8"));
-
-        List<Label> labels = JSON.parseArray(labelStr, Label.class);
-        labelMap = labels.stream().collect(Collectors.toMap(Label::getName, Function.identity()));
+        File labelFile = new File(USER_HOME + PROJECT_DIR + LABEL_FILE_NAME);
+        if (labelFile.exists()) {
+            String labelStr = FileUtils.readFileToString(labelFile, Charset.forName("UTF-8"));
+            List<Label> labels = JSON.parseArray(labelStr, Label.class);
+            labelMap =
+                new LinkedHashMap<>(labels.stream().collect(Collectors.toMap(Label::getName, Function.identity())));
+        }
     }
 
 }

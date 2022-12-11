@@ -82,6 +82,9 @@ public class Task {
     }
 
     public void changeOrder(Integer order) {
+        if (state.equals(TaskState.FINISHED)) {
+            throw new IllegalStateException("can't change finished task order");
+        }
         taskRepository.changeUnfinishedTaskOrder(this, order);
     }
 
@@ -134,5 +137,9 @@ public class Task {
 
         Task other = (Task)obj;
         return Objects.equals(id, other.id);
+    }
+
+    public List<Label> getLabels() {
+        return labels;
     }
 }

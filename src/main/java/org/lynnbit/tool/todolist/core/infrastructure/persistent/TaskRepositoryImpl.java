@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.lynnbit.tool.todolist.core.domain.model.Task;
 import org.lynnbit.tool.todolist.core.domain.model.TaskRepository;
-import org.lynnbit.tool.todolist.core.domain.model.TaskState;
 
 import com.alibaba.fastjson.JSON;
 
@@ -58,10 +57,6 @@ public class TaskRepositoryImpl implements TaskRepository {
             throw new IllegalStateException("the task is not created");
         }
 
-        if (task.getState().equals(TaskState.FINISHED)) {
-            throw new IllegalStateException("can't change finished task order");
-        }
-
         if (order >= unfinishedTask.size()) {
             throw new IllegalStateException("the order is exceed the size of unfinished task list");
         }
@@ -84,13 +79,17 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public void loadTask() throws IOException {
-        String unfinishedTaskStr = FileUtils
-            .readFileToString(new File(USER_HOME + PROJECT_DIR + UNFINISHED_TASK_FILE_NAME), Charset.forName("UTF-8"));
+        File unfinishedFile = new File(USER_HOME + PROJECT_DIR + UNFINISHED_TASK_FILE_NAME);
+        if (unfinishedFile.exists()) {
+            String unfinishedTaskStr = FileUtils.readFileToString(unfinishedFile, Charset.forName("UTF-8"));
+            unfinishedTask = JSON.parseArray(unfinishedTaskStr, Task.class);
+        }
 
-        String finishedTaskStr = FileUtils.readFileToString(new File(USER_HOME + PROJECT_DIR + FINISHED_TASK_FILE_NAME),
-            Charset.forName("UTF-8"));
+        File finishedFile = new File(USER_HOME + PROJECT_DIR + FINISHED_TASK_FILE_NAME);
+        if (finishedFile.exists()) {
+            String finishedTaskStr = FileUtils.readFileToString(finishedFile, Charset.forName("UTF-8"));
+            finishedTask = JSON.parseArray(finishedTaskStr, Task.class);
+        }
 
-        unfinishedTask = JSON.parseArray(unfinishedTaskStr, Task.class);
-        finishedTask = JSON.parseArray(finishedTaskStr, Task.class);
     }
 }

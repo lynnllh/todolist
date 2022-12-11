@@ -62,4 +62,8 @@ public class Label {
     public String getName() {
         return name;
     }
+
+    public Color getColor() {
+        return color;
+    }
 }

@@ -19,6 +19,9 @@ public class TTrayIcon extends TrayIcon {
         super(image, tooltip);
         // 设置系统托盘图标为自适应
         this.setImageAutoSize(true);
+        // 添加组件到面板中
+        pane.getChildren().add(menu);
+
         stage.setScene(new Scene(pane));
         // 去掉面板的标题栏
         stage.initStyle(StageStyle.TRANSPARENT);
@@ -29,8 +32,7 @@ public class TTrayIcon extends TrayIcon {
                 stage.hide();
             }
         });
-        // 添加组件到面板中
-        pane.getChildren().add(menu);
+
         // 设置面板的宽高
         stage.setWidth(menu.getPrefWidth());
         stage.setHeight(menu.getPrefHeight());
