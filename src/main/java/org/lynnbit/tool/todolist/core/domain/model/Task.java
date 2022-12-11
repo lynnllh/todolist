@@ -9,19 +9,10 @@ import java.util.stream.Collectors;
 
 import org.lynnbit.tool.todolist.core.infrastructure.persistent.TaskRepositoryImpl;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Task {
-
     private static TaskRepository taskRepository = TaskRepositoryImpl.getInstance();
 
     public Task(String content) {

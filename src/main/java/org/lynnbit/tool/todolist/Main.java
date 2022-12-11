@@ -13,8 +13,8 @@ import javax.swing.*;
 import org.apache.commons.lang3.StringUtils;
 import org.lynnbit.tool.todolist.core.domain.model.Task;
 import org.lynnbit.tool.todolist.ui.Command;
-import org.lynnbit.tool.todolist.ui.TTrayIcon;
 import org.lynnbit.tool.todolist.ui.TaskPane;
+import org.lynnbit.tool.todolist.ui.trayIcon.TTrayIcon;
 
 import com.tulskiy.keymaster.common.Provider;
 

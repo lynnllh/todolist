@@ -1,4 +1,4 @@
-package org.lynnbit.tool.todolist.ui;
+package org.lynnbit.tool.todolist.ui.trayIcon;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -12,10 +12,13 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class TTrayIcon extends TrayIcon {
-    // 设置面板和布局为静态变量
     private Stage stage = new Stage();
     private StackPane pane = new StackPane();
-    {
+
+    public TTrayIcon(Image image, String tooltip, Region menu) {
+        super(image, tooltip);
+        // 设置系统托盘图标为自适应
+        this.setImageAutoSize(true);
         stage.setScene(new Scene(pane));
         // 去掉面板的标题栏
         stage.initStyle(StageStyle.TRANSPARENT);
@@ -26,12 +29,6 @@ public class TTrayIcon extends TrayIcon {
                 stage.hide();
             }
         });
-    }
-
-    public TTrayIcon(Image image, String tooltip, Region menu) {
-        super(image, tooltip);
-        // 设置系统托盘图标为自适应
-        this.setImageAutoSize(true);
         // 添加组件到面板中
         pane.getChildren().add(menu);
         // 设置面板的宽高
